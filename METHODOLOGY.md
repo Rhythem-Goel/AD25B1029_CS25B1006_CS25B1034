@@ -1,5 +1,7 @@
 # Methodology: Hierarchical Cost-Sensitive Loss Function with Label Smoothing
 
+# The family grouping used in the hierarchical loss is a pseudo-taxonomic grouping based on class_id // 10 and is not derived from actual botanical taxonomy.
+
 ## 1. Introduction
 
 Traditional multi-class image classification models typically use the Categorical Cross-Entropy (CCE) loss function. While effective, CCE treats all classification errors equally. In the Oxford 102 Flower Dataset, some flower species are visually similar and may belong to related botanical groups, whereas others are significantly different.
