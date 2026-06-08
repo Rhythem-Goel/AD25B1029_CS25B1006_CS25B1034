@@ -20,7 +20,9 @@ This hybrid approach encourages better generalization while penalizing biologica
 
 Standard Cross-Entropy Loss is defined as:
 
+$$
 L=-\sum_{i=1}^{K} y_i\log(p_i)
+$$
 
 where:
 
