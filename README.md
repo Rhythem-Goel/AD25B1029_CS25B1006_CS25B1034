@@ -44,6 +44,7 @@ Key outputs: preprocessing module, data visualizations, augmentation pipeline, l
 ---
 
 Member B — Model Architecture & Loss Function
+
 This member took InceptionV3 (pretrained on ImageNet) and adapted it for our task. The original classification head was swapped out for a custom stack: Global Average Pooling → Batch Normalization → Dense(512) → Dropout → Dense(256) → 102-class softmax. Pretty standard transfer learning setup, but the details matter.
 The more interesting part was the custom loss function. Rather than plain cross-entropy, we designed a hierarchical loss with two components:
 
@@ -80,10 +81,10 @@ Key outputs: trained model, evaluation metrics, experiment logs, final report, p
 
 ---
 
-#Evaluation
+# Evaluation
 
 We evaluated the final model on the held-out test set using accuracy, precision, recall, F1, confusion matrix, and per-class accuracy. With 102 classes, per-class analysis was especially useful for spotting where the model struggled — some species are genuinely hard to distinguish visually.
 
-#Takeaways
+# Takeaways
 
 Transfer learning works well here, but the details really matter. Naive fine-tuning without careful learning rate scheduling tended to degrade performance. The hierarchical loss didn't produce dramatic improvements on its own, but combined with the other techniques it contributed to a more robust model. If we were to extend this, better class-balanced sampling and ensembling would be natural next steps.
