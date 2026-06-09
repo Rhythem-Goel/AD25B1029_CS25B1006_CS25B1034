@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project develops a deep learning–based flower classification system using the Oxford 102 Flower Categories dataset. The objective is to accurately classify flower images into one of 102 species using transfer learning with InceptionV3. The model incorporates advanced techniques such as custom hierarchical loss, data augmentation, fine-tuning, and performance evaluation using multiple classification metrics.
+This project builds a flower classification system using deep learning on the Oxford 102 Flower Categories dataset. The goal is to correctly identify flower species from images — all 102 of them — using transfer learning on top of InceptionV3. Along the way, we explored things like custom loss functions, data augmentation strategies, and a two-phase fine-tuning approach to squeeze out better performance.
 
 ---
 
@@ -23,180 +23,46 @@ This project develops a deep learning–based flower classification system using
 | Validation |   1020 |
 | Testing    |   1020 |
 
-The original dataset split was modified so that the larger image pool is used for training, improving model generalization and classification performance.
+We reshuffled the original dataset split so more images went into training. The default split wasn't ideal for learning, and this change made a noticeable difference in how well the model generalized.
 
 ---
 
 # Team Contribution and Workflow
 
-The project was developed collaboratively by dividing the workflow into three major modules.
+We split the work into three main areas so each person could go deep on their part while keeping everything connected.
 
 ---
 
-## Member A: Dataset Preparation, Augmentation and Baseline Development
+Member A — Data Preparation & Augmentation
 
-### Responsibilities
+This member handled everything before the model sees a single image. That meant downloading and extracting the Oxford dataset, parsing labels and split files, and organizing images into proper train/val/test folders. We also did a round of exploratory analysis — checking class distributions, making sure nothing was corrupted, and visualizing what the data actually looked like.
 
-#### 1. Dataset Preparation
+On the augmentation side, we applied a fairly aggressive set of transforms: rotation, shifting, zoom, shear, flips (both horizontal and vertical), brightness variation, and channel shifting. The idea was to make the model robust to the kinds of variation you'd expect in real flower photos — different angles, lighting, cropping, etc.
 
-* Loaded Oxford 102 Flower Dataset
-* Extracted image archive
-* Processed image labels and split information
-* Created structured train, validation and test directories
-* Generated dataset statistics and visualizations
-
-#### 2. Exploratory Data Analysis (EDA)
-
-* Analyzed class distribution
-* Visualized train/validation/test split
-* Displayed sample flower images
-* Verified dataset integrity
-
-#### 3. Data Augmentation
-
-Implemented image augmentation techniques including:
-
-* Rotation
-* Width and height shifting
-* Zooming
-* Shearing
-* Horizontal and vertical flipping
-* Brightness adjustment
-* Channel shifting
-
-#### 4. Baseline Pipeline
-
-* Created ImageDataGenerator pipelines
-* Configured batch loading
-* Established preprocessing workflow
-* Prepared baseline model training environment
-
-### Deliverables
-
-* Dataset preprocessing module
-* Dataset visualization graphs
-* Augmentation pipeline
-* Data loading framework
+Key outputs: preprocessing module, data visualizations, augmentation pipeline, loading framework
 
 ---
 
-## Member B: InceptionV3 Architecture Modifications and Custom Loss Function
+Member B — Model Architecture & Loss Function
+This member took InceptionV3 (pretrained on ImageNet) and adapted it for our task. The original classification head was swapped out for a custom stack: Global Average Pooling → Batch Normalization → Dense(512) → Dropout → Dense(256) → 102-class softmax. Pretty standard transfer learning setup, but the details matter.
+The more interesting part was the custom loss function. Rather than plain cross-entropy, we designed a hierarchical loss with two components:
 
-### Responsibilities
+Label smoothing — softens the one-hot targets a bit, which helped prevent the model from becoming overconfident on training data.
+Family penalty — adds extra cost when the model predicts the wrong family of flower, not just the wrong species. The intuition is that misclassifying a tulip as a rose is worse than confusing two tulip subspecies.
 
-#### 1. Transfer Learning Architecture
-
-Implemented InceptionV3 using ImageNet pretrained weights.
-
-### Architecture Modifications
-
-* Removed original classification head
-* Added Global Average Pooling layer
-* Added Batch Normalization
-* Added Dense(512) layer
-* Added Dropout regularization
-* Added Dense(256) layer
-* Added final 102-class softmax classifier
-
-#### 2. Mixed Precision Training
-
-* Enabled float16 computation
-* Reduced GPU memory consumption
-* Improved training speed
-
-#### 3. Custom Hierarchical Loss Function
-
-Designed a cost-sensitive loss function incorporating:
-
-##### Label Smoothing
-
-* Reduced model overconfidence
-* Improved generalization
-
-##### Family Penalty
-
-* Penalized predictions belonging to incorrect flower families
-* Encouraged taxonomically meaningful predictions
-
-#### 4. Fine-Tuning Strategy
-
-* Controlled layer freezing
-* Unfroze top InceptionV3 layers
-* Optimized transfer learning process
-
-### Deliverables
-
-* Modified InceptionV3 architecture
-* Custom hierarchical loss implementation
-* Fine-tuning strategy
-* Transfer learning framework
-
+We also enabled mixed precision (float16) training to cut memory usage and speed things up on GPU.
+Key outputs: modified InceptionV3, custom loss, fine-tuning setup
 ---
+Member C — Training, Evaluation & Reporting
 
-## Member C: Training Experiments, Evaluation and Documentation
+Training happened in two phases. In Phase 1, the InceptionV3 backbone was frozen and only the new classification head was trained. Once that converged, Phase 2 unfroze the upper layers of the backbone for fine-tuning, using cosine learning rate decay and gradient clipping to keep things stable.
 
-### Responsibilities
+We ran several experiments tweaking learning rates, dropout rates, how many layers to unfreeze, and training length. Not everything helped — some combinations made 
+things worse — but that's kind of the point of running experiments.
 
-#### 1. Model Training
+For evaluation, we looked at accuracy, precision, recall, F1, a full classification report, and a confusion matrix. We also did per-class accuracy breakdowns because aggregate metrics can hide a lot with 102 classes.
 
-Conducted two-stage training:
-
-### Phase 1
-
-* Trained custom classification head
-* Kept InceptionV3 backbone frozen
-
-### Phase 2
-
-* Fine-tuned upper InceptionV3 layers
-* Applied cosine learning rate decay
-* Used gradient clipping for stable optimization
-
-#### 2. Hyperparameter Experiments
-
-Evaluated:
-
-* Learning rates
-* Epoch configurations
-* Fine-tuning depth
-* Dropout settings
-* Optimization strategies
-
-#### 3. Model Evaluation
-
-Generated performance metrics:
-
-* Accuracy
-* Precision
-* Recall
-* F1 Score
-* Classification Report
-* Confusion Matrix
-* Per-Class Accuracy Analysis
-
-#### 4. Visualization and Reporting
-
-Produced:
-
-* Training loss curves
-* Accuracy curves
-* Dataset split graphs
-* Confusion matrix visualizations
-* Sample prediction results
-
-#### 5. Documentation
-
-* Compiled project findings
-* Summarized experimental results
-* Prepared final report and presentation materials
-
-### Deliverables
-
-* Trained model
-* Evaluation metrics
-* Experimental analysis
-* Final report
-* Presentation materials
+Key outputs: trained model, evaluation metrics, experiment logs, final report, presentation materials
 
 ---
 
@@ -214,21 +80,10 @@ Produced:
 
 ---
 
-# Evaluation Metrics
+#Evaluation
 
-The final model performance was assessed using:
+We evaluated the final model on the held-out test set using accuracy, precision, recall, F1, confusion matrix, and per-class accuracy. With 102 classes, per-class analysis was especially useful for spotting where the model struggled — some species are genuinely hard to distinguish visually.
 
-* Accuracy
-* Precision
-* Recall
-* F1 Score
-* Confusion Matrix
-* Per-Class Accuracy
+#Takeaways
 
-These metrics provide a comprehensive evaluation of classification performance across all 102 flower categories.
-
----
-
-# Conclusion
-
-This project demonstrates the effectiveness of transfer learning using InceptionV3 for large-scale flower classification. Through extensive data augmentation, custom loss design, and systematic fine-tuning, the model achieves strong performance while maintaining robust generalization across diverse flower species.
+Transfer learning works well here, but the details really matter. Naive fine-tuning without careful learning rate scheduling tended to degrade performance. The hierarchical loss didn't produce dramatic improvements on its own, but combined with the other techniques it contributed to a more robust model. If we were to extend this, better class-balanced sampling and ensembling would be natural next steps.
