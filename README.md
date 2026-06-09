@@ -33,7 +33,7 @@ We split the work into three main areas so each person could go deep on their pa
 
 ---
 
-## Member A — Data Preparation & Augmentation
+## Akhand Verma — Data Preparation & Augmentation
 
 This member handled everything before the model sees a single image. That meant downloading and extracting the Oxford dataset, parsing labels and split files, and organizing images into proper train/val/test folders. We also did a round of exploratory analysis — checking class distributions, making sure nothing was corrupted, and visualizing what the data actually looked like.
 
@@ -43,7 +43,7 @@ Key outputs: preprocessing module, data visualizations, augmentation pipeline, l
 
 ---
 
-## Member B — Model Architecture & Loss Function
+## Rhythem Goel — Model Architecture & Loss Function
 
 This member took InceptionV3 (pretrained on ImageNet) and adapted it for our task. The original classification head was swapped out for a custom stack: Global Average Pooling → Batch Normalization → Dense(512) → Dropout → Dense(256) → 102-class softmax. Pretty standard transfer learning setup, but the details matter.
 The more interesting part was the custom loss function. Rather than plain cross-entropy, we designed a hierarchical loss with two components:
@@ -54,7 +54,7 @@ Family penalty — adds extra cost when the model predicts the wrong family of f
 We also enabled mixed precision (float16) training to cut memory usage and speed things up on GPU.
 Key outputs: modified InceptionV3, custom loss, fine-tuning setup
 ---
-## Member C — Training, Evaluation & Reporting
+## Ryan Manchanda — Training, Evaluation & Reporting
 
 Training happened in two phases. In Phase 1, the InceptionV3 backbone was frozen and only the new classification head was trained. Once that converged, Phase 2 unfroze the upper layers of the backbone for fine-tuning, using cosine learning rate decay and gradient clipping to keep things stable.
 
